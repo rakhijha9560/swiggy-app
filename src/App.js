@@ -1,25 +1,74 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import HeaderComponent from "./MyComponent/HeaderComponent";
+import BodyComponent from "./MyComponent/BodyComponent";
+import FooterComponent from "./MyComponent/FooterComponent";
+import ReactDOM from "react-dom/client";
+import About from "./MyComponent/About";
+import Error from "./MyComponent/Error";
+import Contact from "./MyComponent/Contact";
+import ProfileClass from "./MyComponent/ProfileClass";
+// import Profile from "./MyComponent/ProfileClass";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import RestrauntMenu from "./MyComponent/RestrauntMenu";
+import { lazy, Suspense } from "react";
+import Shimmer from "./MyComponent/Shimmer";
+import UserContext from "./Utils/UserContext";
 
-function App() {
+const Instamart = lazy(() => import("./MyComponent/Instamart"));
+
+const AppLayout = () => {
+  const [user, setUser] = useState({
+    name: "Rakhijha",
+    email: "rakhijha9560@gmail.com"
+  })
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+    <>
+    <UserContext.Provider value={{
+      user:  user,
+      setUser: setUser,
+    }}>
+      <Router>
+        <HeaderComponent />
 
-export default App;
+        <Routes>
+          <Route path="/" element={<BodyComponent />} />
+
+          <Route path="/about" element={<About />}>
+            <Route path="profileClass" element={<ProfileClass />} />
+          </Route>
+          <Route path="/Contact" element={<Contact />} />
+          <Route path="/restaurant/:id" element={<RestrauntMenu />} />
+          <Route path="/error" element={<Error />} />
+          <Route
+            path="/instamart"
+            element={
+              <Suspense fallback={<Shimmer />}>
+                <Instamart />
+              </Suspense>
+            }
+          />
+        </Routes>
+
+        <FooterComponent />
+      </Router>
+      </UserContext.Provider>
+    </>
+  );
+};
+
+// const appRouter = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: <AppLayout />,
+//     errorElement: <Error />,
+//   },
+//   {
+//     path: "/about",
+//     element: <About />,
+//   },
+// ]);
+
+//  const root = ReactDOM.createRoot(document.getElementById("root"));
+//   root.render(<appRouter />);
+
+export default AppLayout;
